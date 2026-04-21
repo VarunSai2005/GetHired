@@ -27,3 +27,19 @@ class Config:
     GEMINI_FLASH_MODEL: str = os.getenv("GEMINI_FLASH_MODEL", "gemini-1.5-flash")
     GEMINI_PRO_MODEL: str = os.getenv("GEMINI_PRO_MODEL", "gemini-1.5-pro")
     GROQ_MODEL: str = os.getenv("GROQ_MODEL", "llama-3-8b-8192")
+<<<<<<< HEAD
+
+    # ── Resume uploads ────────────────────────────────────
+    RESUME_UPLOAD_DIR: str = os.getenv("RESUME_UPLOAD_DIR", os.path.join(os.getcwd(), "uploads", "resumes"))
+    MAX_RESUME_FILE_SIZE_MB: int = int(os.getenv("MAX_RESUME_FILE_SIZE_MB", 5))
+
+    # ── Feedback email ────────────────────────────────────
+    FEEDBACK_TO_EMAIL: str = os.getenv("FEEDBACK_TO_EMAIL", "")
+    SMTP_HOST: str = os.getenv("SMTP_HOST", "")
+    SMTP_PORT: int = int(os.getenv("SMTP_PORT", 587))
+    SMTP_USERNAME: str = os.getenv("SMTP_USERNAME", "")
+    SMTP_PASSWORD: str = os.getenv("SMTP_PASSWORD", "")
+    SMTP_FROM_EMAIL: str = os.getenv("SMTP_FROM_EMAIL", "")
+    SMTP_USE_TLS: bool = os.getenv("SMTP_USE_TLS", "1") == "1"
+=======
+>>>>>>> 6c27ca74f19f73028bd42b31a94a3f04c004802b

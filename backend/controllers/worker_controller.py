@@ -63,3 +63,36 @@ def list_workers():
     }
     workers = worker_service.list_all(filters)
     return success({"workers": workers, "count": len(workers)})
+<<<<<<< HEAD
+
+
+@role_required("worker")
+def get_saved_jobs():
+    """GET /api/v1/workers/saved-jobs"""
+    user_id = get_jwt_identity()
+    jobs = worker_service.list_saved_jobs(user_id)
+    return success({"jobs": jobs, "count": len(jobs)})
+
+
+@role_required("worker")
+def save_job(job_id: str):
+    """POST /api/v1/workers/saved-jobs/<job_id>"""
+    user_id = get_jwt_identity()
+    try:
+        result = worker_service.save_job(user_id, job_id)
+    except ValueError as e:
+        return error(str(e), 400)
+    return success(result, 201)
+
+
+@role_required("worker")
+def unsave_job(job_id: str):
+    """DELETE /api/v1/workers/saved-jobs/<job_id>"""
+    user_id = get_jwt_identity()
+    try:
+        result = worker_service.unsave_job(user_id, job_id)
+    except ValueError as e:
+        return error(str(e), 400)
+    return success(result)
+=======
+>>>>>>> 6c27ca74f19f73028bd42b31a94a3f04c004802b

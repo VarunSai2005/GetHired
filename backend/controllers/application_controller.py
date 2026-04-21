@@ -2,8 +2,18 @@
 Application controller — individual + group job applications.
 """
 
+<<<<<<< HEAD
+import os
+from uuid import uuid4
+
+from flask import request
+from flask import current_app, send_from_directory
+from flask_jwt_extended import get_jwt_identity
+from werkzeug.utils import secure_filename
+=======
 from flask import request
 from flask_jwt_extended import get_jwt_identity
+>>>>>>> 6c27ca74f19f73028bd42b31a94a3f04c004802b
 
 from utils import role_required, success, error
 import services.application_service as app_service
@@ -13,15 +23,51 @@ import services.application_service as app_service
 def apply_to_job():
     """
     POST /api/v1/applications/
+<<<<<<< HEAD
+    Body: multipart/form-data with fields { job_id, cover_letter?, resume=<pdf> }
+    """
+    worker_id = get_jwt_identity()
+    data = {}
+    saved_resume_path = None
+
+    if request.content_type and "multipart/form-data" in request.content_type:
+        data["job_id"] = (request.form.get("job_id") or "").strip()
+        data["cover_letter"] = (request.form.get("cover_letter") or "").strip()
+
+        resume = request.files.get("resume")
+        if not resume:
+            return error("resume PDF file is required.", 400)
+
+        incoming_name = secure_filename(resume.filename or "")
+        if not incoming_name.lower().endswith(".pdf"):
+            return error("Only PDF resumes are allowed.", 400)
+
+        unique_name = f"{uuid4().hex}.pdf"
+        upload_dir = current_app.config["RESUME_UPLOAD_DIR"]
+        os.makedirs(upload_dir, exist_ok=True)
+        saved_resume_path = os.path.join(upload_dir, unique_name)
+        resume.save(saved_resume_path)
+
+        data["resume_file_name"] = unique_name
+    else:
+        data = request.get_json(silent=True) or {}
+
+=======
     Body: { job_id, cover_letter?, resume_url? }
     """
     worker_id = get_jwt_identity()
     data      = request.get_json(silent=True) or {}
+>>>>>>> 6c27ca74f19f73028bd42b31a94a3f04c004802b
     if not data.get("job_id"):
         return error("job_id is required.", 400)
     try:
         application = app_service.apply_individual(worker_id, data)
     except ValueError as e:
+<<<<<<< HEAD
+        if saved_resume_path and os.path.exists(saved_resume_path):
+            os.remove(saved_resume_path)
+=======
+>>>>>>> 6c27ca74f19f73028bd42b31a94a3f04c004802b
         return error(str(e), 400)
     return success(application, 201)
 
@@ -101,3 +147,19 @@ def withdraw_application(application_id: str):
     except ValueError as e:
         return error(str(e), 400)
     return success({"message": "Application withdrawn successfully."})
+<<<<<<< HEAD
+
+
+@role_required("worker", "representative", "employer")
+def download_application_resume(application_id: str):
+    """GET /api/v1/applications/<application_id>/resume"""
+    user_id = get_jwt_identity()
+    try:
+        resume_file_name = app_service.get_resume_file_name(application_id, user_id)
+    except ValueError as e:
+        return error(str(e), 404)
+
+    upload_dir = current_app.config["RESUME_UPLOAD_DIR"]
+    return send_from_directory(upload_dir, resume_file_name, as_attachment=False, mimetype="application/pdf")
+=======
+>>>>>>> 6c27ca74f19f73028bd42b31a94a3f04c004802b

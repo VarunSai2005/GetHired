@@ -8,6 +8,10 @@ from bson.errors import InvalidId
 
 from database import get_db
 from models.worker_model import build_worker_profile, serialize_worker_profile, WORKER_TYPES
+<<<<<<< HEAD
+from models.job_model import serialize_job
+=======
+>>>>>>> 6c27ca74f19f73028bd42b31a94a3f04c004802b
 
 
 def _sanitize_list(items):
@@ -106,3 +110,64 @@ def list_all(filters: dict) -> list:
 
     docs = db["profiles"].find(query).sort("created_at", -1).limit(50)
     return [serialize_worker_profile(d) for d in docs]
+<<<<<<< HEAD
+
+
+def list_saved_jobs(user_id: str) -> list:
+    """Return full job documents saved by this worker, newest saved first."""
+    db = get_db()
+    oid = ObjectId(user_id)
+
+    saved_docs = list(
+        db["saved_jobs"].find({"user_id": oid}).sort("created_at", -1)
+    )
+    if not saved_docs:
+        return []
+
+    ordered_job_ids = [d["job_id"] for d in saved_docs]
+    jobs = list(db["jobs"].find({"_id": {"$in": ordered_job_ids}}))
+    by_id = {job["_id"]: job for job in jobs}
+
+    return [
+        serialize_job(by_id[job_id])
+        for job_id in ordered_job_ids
+        if job_id in by_id
+    ]
+
+
+def save_job(user_id: str, job_id: str) -> dict:
+    """Save a job for this worker. Idempotent."""
+    db = get_db()
+    oid = ObjectId(user_id)
+
+    try:
+        job_oid = ObjectId(job_id)
+    except InvalidId:
+        raise ValueError("Invalid job ID.")
+
+    job_exists = db["jobs"].find_one({"_id": job_oid})
+    if not job_exists:
+        raise ValueError("Job not found.")
+
+    db["saved_jobs"].update_one(
+        {"user_id": oid, "job_id": job_oid},
+        {"$setOnInsert": {"created_at": datetime.now(timezone.utc)}},
+        upsert=True,
+    )
+    return {"saved": True, "job_id": job_id}
+
+
+def unsave_job(user_id: str, job_id: str) -> dict:
+    """Remove a saved job for this worker. Idempotent."""
+    db = get_db()
+    oid = ObjectId(user_id)
+
+    try:
+        job_oid = ObjectId(job_id)
+    except InvalidId:
+        raise ValueError("Invalid job ID.")
+
+    result = db["saved_jobs"].delete_one({"user_id": oid, "job_id": job_oid})
+    return {"saved": False, "job_id": job_id, "removed": result.deleted_count > 0}
+=======
+>>>>>>> 6c27ca74f19f73028bd42b31a94a3f04c004802b

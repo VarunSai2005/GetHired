@@ -20,6 +20,27 @@ def update_profile():
     from controllers.worker_controller import update_worker_profile
     return update_worker_profile()
 
+<<<<<<< HEAD
+# GET  /api/v1/workers/saved-jobs
+@worker_bp.get("/saved-jobs")
+def get_saved_jobs():
+    from controllers.worker_controller import get_saved_jobs
+    return get_saved_jobs()
+
+# POST /api/v1/workers/saved-jobs/<job_id>
+@worker_bp.post("/saved-jobs/<job_id>")
+def save_job(job_id):
+    from controllers.worker_controller import save_job
+    return save_job(job_id)
+
+# DELETE /api/v1/workers/saved-jobs/<job_id>
+@worker_bp.delete("/saved-jobs/<job_id>")
+def unsave_job(job_id):
+    from controllers.worker_controller import unsave_job
+    return unsave_job(job_id)
+
+=======
+>>>>>>> 6c27ca74f19f73028bd42b31a94a3f04c004802b
 # GET  /api/v1/workers/<worker_id>
 @worker_bp.get("/<worker_id>")
 def get_worker(worker_id):

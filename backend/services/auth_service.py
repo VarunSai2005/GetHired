@@ -81,3 +81,54 @@ def get_user_by_id(user_id: str) -> dict | None:
         return None
     user = db["users"].find_one({"_id": oid})
     return serialize_user(user) if user else None
+<<<<<<< HEAD
+
+
+def update_user(user_id: str, data: dict) -> dict:
+    """Update current user account fields (email and/or password)."""
+    db = get_db()
+    try:
+        oid = ObjectId(user_id)
+    except InvalidId:
+        raise ValueError("Invalid user ID.")
+
+    updates = {}
+    if "email" in data:
+        email = str(data.get("email", "")).strip().lower()
+        if not email:
+            raise ValueError("email cannot be empty.")
+        existing = db["users"].find_one({"email": email})
+        if existing and existing.get("_id") != oid:
+            raise ValueError("An account with this email already exists.")
+        updates["email"] = email
+
+    wants_password_change = "new_password" in data or "current_password" in data
+    if wants_password_change:
+        current_password = str(data.get("current_password", ""))
+        new_password = str(data.get("new_password", ""))
+        if not current_password or not new_password:
+            raise ValueError("current_password and new_password are required to change password.")
+        if len(new_password) < 6:
+            raise ValueError("New password must be at least 6 characters.")
+
+        user = db["users"].find_one({"_id": oid})
+        if not user:
+            raise ValueError("User not found.")
+        if not _check_password(current_password, user["password"]):
+            raise ValueError("Current password is incorrect.")
+        if _check_password(new_password, user["password"]):
+            raise ValueError("New password must be different from current password.")
+
+        updates["password"] = _hash_password(new_password)
+
+    if not updates:
+        raise ValueError("No valid account fields provided for update.")
+
+    updates["updated_at"] = datetime.now(timezone.utc)
+    db["users"].update_one({"_id": oid}, {"$set": updates})
+    user = db["users"].find_one({"_id": oid})
+    if not user:
+        raise ValueError("User not found.")
+    return serialize_user(user)
+=======
+>>>>>>> 6c27ca74f19f73028bd42b31a94a3f04c004802b

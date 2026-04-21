@@ -93,3 +93,35 @@ def logout_user():
      Token blocklist can be added later via Redis.)
     """
     return jsonify({"message": "Logged out successfully."}), 200
+<<<<<<< HEAD
+
+
+@jwt_required()
+def get_me():
+    """GET /api/v1/auth/me"""
+    user_id = get_jwt_identity()
+    user = auth_service.get_user_by_id(user_id)
+    if not user:
+        return jsonify({"error": "User not found."}), 404
+    return jsonify({"user": user}), 200
+
+
+@jwt_required()
+def update_me():
+    """
+    PATCH /api/v1/auth/me
+    Body supports:
+      - email
+      - current_password + new_password
+    """
+    user_id = get_jwt_identity()
+    body = request.get_json(silent=True) or {}
+
+    try:
+        user = auth_service.update_user(user_id, body)
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+
+    return jsonify({"user": user, "message": "Account updated successfully."}), 200
+=======
+>>>>>>> 6c27ca74f19f73028bd42b31a94a3f04c004802b

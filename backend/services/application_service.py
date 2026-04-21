@@ -70,6 +70,12 @@ def apply_individual(worker_id: str, data: dict) -> dict:
     db  = get_db()
     job = _get_job_or_raise(db, data.get("job_id", ""))
 
+<<<<<<< HEAD
+    if not data.get("resume_file_name"):
+        raise ValueError("Resume PDF is required for application.")
+
+=======
+>>>>>>> 6c27ca74f19f73028bd42b31a94a3f04c004802b
     woid = ObjectId(worker_id)
     _duplicate_check(db, job["_id"], [woid])
 
@@ -190,6 +196,35 @@ def get_for_job(job_id: str, employer_id: str) -> list:
     return [serialize_application(d) for d in docs]
 
 
+<<<<<<< HEAD
+def get_resume_file_name(application_id: str, user_id: str) -> str:
+    """Return resume file name for an application if caller has access."""
+    db = get_db()
+    try:
+        aid = ObjectId(application_id)
+        uoid = ObjectId(user_id)
+    except InvalidId:
+        raise ValueError("Invalid ID.")
+
+    doc = db["applications"].find_one({"_id": aid})
+    if not doc:
+        raise ValueError("Application not found.")
+
+    resume_file_name = doc.get("resume_file_name")
+    if not resume_file_name:
+        raise ValueError("Resume not found for this application.")
+
+    job = db["jobs"].find_one({"_id": doc["job_id"]})
+    is_applicant = doc["applicant_id"] == uoid
+    is_employer = bool(job and job.get("employer_id") == uoid)
+    if not (is_applicant or is_employer):
+        raise ValueError("Access denied.")
+
+    return resume_file_name
+
+
+=======
+>>>>>>> 6c27ca74f19f73028bd42b31a94a3f04c004802b
 # ── Status management ─────────────────────────────────────────────────────────
 
 def update_status(application_id: str, employer_id: str, status: str) -> dict:
